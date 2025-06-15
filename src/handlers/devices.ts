@@ -4,13 +4,13 @@ import { info } from '../utils/logger.js';
 import { isEventExcluded } from '../utils/eventFilter.js';
 
 // Process and report discovered devices
-export async function processDiscoveredDevices(deviceData) {
+export async function processDiscoveredDevices(deviceData: any[]): Promise<void> {
   info('\n📱 Ring Devices Found:');
   info(`Total devices: ${deviceData?.length || 0}`);
 
   if (deviceData && deviceData.length > 0) {
     // Group devices by type
-    const devicesByType = {};
+    const devicesByType: Record<string, any[]> = {};
     deviceData.forEach((device) => {
       const kind = device.kind || 'unknown';
       if (!devicesByType[kind]) devicesByType[kind] = [];
@@ -42,7 +42,7 @@ export async function processDiscoveredDevices(deviceData) {
         if (!isEventExcluded('device_found') && shouldSendEvent('device_found', eventData)) {
           await sendToN8n('device_found', eventData);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error sending device data to n8n:', err.message);
       }
     }
@@ -83,7 +83,7 @@ export async function processDiscoveredDevices(deviceData) {
           ) {
             await sendToN8n('base_station_found', eventData);
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error('Error sending base station data to n8n:', err.message);
         }
       }
@@ -121,7 +121,7 @@ export async function processDiscoveredDevices(deviceData) {
           if (!isEventExcluded('camera_found') && shouldSendEvent('camera_found', eventData)) {
             await sendToN8n('camera_found', eventData);
           }
-        } catch (err) {
+        } catch (err: any) {
           console.error('Error sending camera data to n8n:', err.message);
         }
       }

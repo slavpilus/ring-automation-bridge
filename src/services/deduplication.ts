@@ -1,8 +1,9 @@
 import { debugLog } from '../utils/logger.js';
 import { trackEvent } from '../utils/eventStats.js';
+import type { EventType } from '../types/events.js';
 
 // Store recent events to avoid duplicates
-const recentEvents = new Map();
+const recentEvents = new Map<string, number>();
 
 // Cleanup old events periodically
 setInterval(() => {
@@ -17,7 +18,7 @@ setInterval(() => {
 }, 30000); // Clean up every 30 seconds
 
 // Helper function to deduplicate events
-export function isDuplicateEvent(eventId, ttlMs = 60000) {
+export function isDuplicateEvent(eventId: string, ttlMs: number = 60000): boolean {
   // If no eventId provided, can't deduplicate
   if (!eventId) return false;
 
@@ -34,7 +35,7 @@ export function isDuplicateEvent(eventId, ttlMs = 60000) {
 }
 
 // Generate a consistent event ID from event data
-export function generateEventId(eventType, data) {
+export function generateEventId(eventType: EventType | string, data: Record<string, any>): string {
   // For motion events, try to extract a stable ID
   if (eventType === 'motion_detected') {
     // Try multiple possible ID sources in order of preference
@@ -63,7 +64,7 @@ export function generateEventId(eventType, data) {
 }
 
 // Check if event should be sent (not duplicate and not excluded)
-export function shouldSendEvent(eventType, data) {
+export function shouldSendEvent(eventType: EventType | string, data: Record<string, any>): boolean {
   const eventId = generateEventId(eventType, data);
 
   if (isDuplicateEvent(eventId)) {

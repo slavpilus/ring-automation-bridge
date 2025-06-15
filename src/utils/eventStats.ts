@@ -1,5 +1,7 @@
+import type { EventStats } from '../types/events.js';
+
 // Event tracking for debugging
-export const eventStats = {
+export const eventStats: EventStats = {
   received: {},
   sent: {},
   blocked: {},
@@ -7,6 +9,6 @@ export const eventStats = {
 };
 
 // Update event statistics
-export function trackEvent(type, eventType) {
+export function trackEvent(type: keyof EventStats, eventType: string): void {
   eventStats[type][eventType] = (eventStats[type][eventType] || 0) + 1;
 }

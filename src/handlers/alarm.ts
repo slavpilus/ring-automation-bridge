@@ -4,10 +4,10 @@ import { info, debugLog } from '../utils/logger.js';
 import { isEventExcluded } from '../utils/eventFilter.js';
 
 // Set up alarm mode change handler
-export async function setupAlarmHandlers(location) {
+export async function setupAlarmHandlers(location: any): Promise<void> {
   try {
     const devices = await location.getDevices();
-    const alarmDevices = devices.filter((d) => d.deviceType === 'security-panel');
+    const alarmDevices = devices.filter((d: any) => d.deviceType === 'security-panel');
 
     if (alarmDevices.length > 0) {
       info(`🔒 Found ${alarmDevices.length} alarm device(s) at ${location.name}`);
@@ -34,13 +34,13 @@ export async function setupAlarmHandlers(location) {
               !isEventExcluded('alarm_mode_state') &&
               shouldSendEvent('alarm_mode_state', initialStateData)
             ) {
-              await sendToN8n('alarm_mode_state', initialStateData).catch((err) =>
+              await sendToN8n('alarm_mode_state', initialStateData).catch((err: any) =>
                 debugLog(`Failed to send initial alarm state: ${err.message}`),
               );
             }
 
             // Subscribe to alarm mode changes
-            alarm.onData.subscribe(async (data) => {
+            alarm.onData.subscribe(async (data: any) => {
               debugLog(`Alarm data update for ${location.name}: ${JSON.stringify(data)}`);
 
               // Check if mode property exists and has changed
@@ -68,7 +68,7 @@ export async function setupAlarmHandlers(location) {
               }
             });
             info('✅ Successfully subscribed to alarm mode changes');
-          } catch (error) {
+          } catch (error: any) {
             info(`⚠️ Could not subscribe to alarm events: ${error.message}`);
           }
         } else {
@@ -78,7 +78,7 @@ export async function setupAlarmHandlers(location) {
     } else {
       info(`ℹ️ No alarm devices found at ${location.name}`);
     }
-  } catch (error) {
+  } catch (error: any) {
     info(`⚠️ Error accessing alarm devices: ${error.message}`);
   }
 }

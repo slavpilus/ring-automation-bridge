@@ -70,7 +70,10 @@ async function setupRingListeners() {
       locations,
     };
   } catch (err) {
-    error('❌ Error setting up Ring listeners:', err);
+    error(
+      '❌ Error setting up Ring listeners:',
+      err instanceof Error ? err : new Error(String(err)),
+    );
     throw err;
   }
 }
@@ -102,8 +105,8 @@ async function setupRingListeners() {
 
       process.exit(0);
     });
-  } catch (err) {
-    error(`Error starting application: ${err.message}`);
+  } catch (err: any) {
+    error(`Error starting application: ${err?.message || 'Unknown error'}`);
     process.exit(1);
   }
 })();

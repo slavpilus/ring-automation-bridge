@@ -4,10 +4,10 @@ import { info, debugLog } from '../utils/logger.js';
 import { isEventExcluded } from '../utils/eventFilter.js';
 
 // Set up doorbell press handler
-export function setupDoorbellHandler(camera, location) {
+export function setupDoorbellHandler(camera: any, location: any): void {
   if (camera.isDoorbot && camera.onDoorbellPressed) {
     try {
-      camera.onDoorbellPressed.subscribe(async (ding) => {
+      camera.onDoorbellPressed.subscribe(async (ding: any) => {
         info(`🔔 Doorbell pressed at ${camera.name}!`);
 
         const eventData = {
@@ -30,7 +30,7 @@ export function setupDoorbellHandler(camera, location) {
         }
       });
       info(`✅ Successfully subscribed to doorbell events for ${camera.name}`);
-    } catch (error) {
+    } catch (error: any) {
       info(`⚠️ Could not subscribe to doorbell events for ${camera.name}: ${error.message}`);
     }
   } else if (camera.isDoorbot) {
@@ -39,11 +39,11 @@ export function setupDoorbellHandler(camera, location) {
 }
 
 // Set up motion detection handler
-export function setupMotionHandler(camera, location) {
+export function setupMotionHandler(camera: any, location: any): void {
   if (camera.onMotionDetected) {
     try {
       info(`🔍 Setting up motion detection for ${camera.name} (primary method)`);
-      camera.onMotionDetected.subscribe(async (motionDetected) => {
+      camera.onMotionDetected.subscribe(async (motionDetected: boolean) => {
         if (motionDetected) {
           info(`🚶 Motion detected at ${camera.name}!`);
 
@@ -67,7 +67,7 @@ export function setupMotionHandler(camera, location) {
         }
       });
       info(`✅ Successfully subscribed to motion events for ${camera.name}`);
-    } catch (error) {
+    } catch (error: any) {
       info(`⚠️ Could not subscribe to motion events for ${camera.name}: ${error.message}`);
     }
   } else {
@@ -76,12 +76,12 @@ export function setupMotionHandler(camera, location) {
 }
 
 // Set up active dings handler
-export function setupActiveDingsHandler(camera, location) {
+export function setupActiveDingsHandler(camera: any, location: any): void {
   if (camera.onActiveDings) {
     try {
       info(`🔍 Setting up motion detection for ${camera.name} (ding events method)`);
-      camera.onActiveDings.subscribe((dings) => {
-        dings.forEach(async (ding) => {
+      camera.onActiveDings.subscribe((dings: any[]) => {
+        dings.forEach(async (ding: any) => {
           info(`🎯 Active event at ${camera.name}: ${ding.kind}`);
 
           // Create event data for the active ding
@@ -121,7 +121,7 @@ export function setupActiveDingsHandler(camera, location) {
         });
       });
       info(`✅ Successfully subscribed to active ding events for ${camera.name}`);
-    } catch (error) {
+    } catch (error: any) {
       info(`⚠️ Could not subscribe to active ding events for ${camera.name}: ${error.message}`);
     }
   } else {
@@ -130,13 +130,13 @@ export function setupActiveDingsHandler(camera, location) {
 }
 
 // Set up data change handler (alternative motion detection)
-export function setupDataHandler(camera, location) {
+export function setupDataHandler(camera: any, location: any): void {
   if (camera.onData) {
     try {
       info(`🔍 Setting up motion detection for ${camera.name} (alternative method)`);
       let lastMotionState = false;
 
-      camera.onData.subscribe((data) => {
+      camera.onData.subscribe((data: any) => {
         debugLog(`Received data update for ${camera.name}: ${JSON.stringify(data)}`);
 
         // Check for motion in multiple ways
@@ -166,7 +166,7 @@ export function setupDataHandler(camera, location) {
             !isEventExcluded('motion_detected') &&
             shouldSendEvent('motion_detected', eventData)
           ) {
-            sendToN8n('motion_detected', eventData).catch((err) =>
+            sendToN8n('motion_detected', eventData).catch((err: any) =>
               console.error(`Error sending motion event: ${err.message}`),
             );
           }
@@ -195,13 +195,13 @@ export function setupDataHandler(camera, location) {
           !isEventExcluded('camera_status_update') &&
           shouldSendEvent('camera_status_update', statusData)
         ) {
-          sendToN8n('camera_status_update', statusData).catch((err) =>
+          sendToN8n('camera_status_update', statusData).catch((err: any) =>
             console.error(`Error sending camera status update: ${err.message}`),
           );
         }
       });
       info(`✅ Successfully subscribed to data events for ${camera.name}`);
-    } catch (error) {
+    } catch (error: any) {
       info(`⚠️ Could not subscribe to data events for ${camera.name}: ${error.message}`);
     }
   } else {
@@ -210,7 +210,7 @@ export function setupDataHandler(camera, location) {
 }
 
 // Set up all camera handlers
-export function setupCameraHandlers(camera, location) {
+export function setupCameraHandlers(camera: any, location: any): void {
   info(`📷 Setting up camera: ${camera.name}`);
 
   setupDoorbellHandler(camera, location);

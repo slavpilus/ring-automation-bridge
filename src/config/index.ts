@@ -1,17 +1,18 @@
 import dotenv from 'dotenv';
+import type { AppConfig } from '../types/config.js';
 
 // Load environment variables
 dotenv.config();
 
 // Parse location IDs if present
-function parseLocationIds() {
+function parseLocationIds(): string[] | undefined {
   if (!process.env.RING_LOCATION_IDS) {
     return undefined;
   }
 
   // Check if the location IDs look valid (should be numbers)
   const rawIds = process.env.RING_LOCATION_IDS.split(',');
-  const validIds = rawIds.filter((id) => !isNaN(id.trim()));
+  const validIds = rawIds.filter((id) => !isNaN(Number(id.trim())));
 
   if (validIds.length > 0) {
     console.log(
@@ -27,7 +28,7 @@ function parseLocationIds() {
 }
 
 // Parse excluded events
-function parseExcludedEvents() {
+function parseExcludedEvents(): string[] {
   return (process.env.EXCLUDED_EVENTS || '')
     .split(',')
     .map((event) => event.trim())
@@ -35,7 +36,7 @@ function parseExcludedEvents() {
 }
 
 // Configuration object
-const config = {
+const config: AppConfig = {
   // Debug mode
   debug: process.env.DEBUG === 'true',
 
@@ -47,7 +48,7 @@ const config = {
 
   // Ring configuration
   ring: {
-    refreshToken: process.env.RING_REFRESH_TOKEN,
+    refreshToken: process.env.RING_REFRESH_TOKEN || '',
     locationIds: parseLocationIds(),
     cameraStatusPollingSeconds: 20,
     locationModePollingSeconds: 20,
@@ -55,13 +56,13 @@ const config = {
 
   // Webhook configuration
   webhook: {
-    url: process.env.WEBHOOK_URL || process.env.N8N_WEBHOOK_URL, // Support both for backwards compatibility
+    url: process.env.WEBHOOK_URL || process.env.N8N_WEBHOOK_URL || '',
     authHeader: process.env.WEBHOOK_AUTH_HEADER || process.env.N8N_AUTH_HEADER,
   },
 };
 
 // Validate required configuration
-export function validateConfig() {
+export function validateConfig(): boolean {
   const errors = [];
 
   if (!config.ring.refreshToken) {
@@ -81,7 +82,7 @@ export function validateConfig() {
 }
 
 // Log configuration (without sensitive data)
-export function logConfig() {
+export function logConfig(): void {
   console.log('\n📋 Environment Configuration:');
   console.log(
     `- RING_REFRESH_TOKEN: ${config.ring.refreshToken ? '✅ Set' : '❌ Missing (required)'}`,

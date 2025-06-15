@@ -1,10 +1,14 @@
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 import config from '../config/index.js';
 import { info, error, debugLog } from '../utils/logger.js';
 import { trackEvent } from '../utils/eventStats.js';
+import type { EventType, EventPayload } from '../types/events.js';
 
-// Helper function to send webhook to n8n
-export async function sendToN8n(eventType, data) {
+// Helper function to send webhook to automation platform
+export async function sendToN8n(
+  eventType: EventType | string,
+  data: Record<string, any>,
+): Promise<AxiosResponse | undefined> {
   // Track received events
   trackEvent('received', eventType);
   debugLog(`Received ${eventType} event: ${JSON.stringify(data)}`);
@@ -24,14 +28,14 @@ export async function sendToN8n(eventType, data) {
   }
 
   try {
-    const payload = {
+    const payload: EventPayload = {
       timestamp: new Date().toISOString(),
       eventType,
       source: 'ring-doorbell',
       data,
     };
 
-    const headers = {};
+    const headers: Record<string, string> = {};
     if (config.webhook.authHeader) {
       headers['Authorization'] = config.webhook.authHeader;
     }
@@ -43,18 +47,18 @@ export async function sendToN8n(eventType, data) {
 
     // Return response for chaining
     return response;
-  } catch (err) {
-    error(`❌ Failed to send ${eventType} to webhook: ${err.message}`);
+  } catch (err: any) {
+    error(`❌ Failed to send ${eventType} to webhook: ${err?.message || 'Unknown error'}`);
     trackEvent('errors', eventType);
 
     // Add more detailed error information for debugging
-    if (err.response) {
+    if (err?.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
       debugLog(`Status: ${err.response.status}`);
       debugLog(`Headers: ${JSON.stringify(err.response.headers)}`);
       debugLog(`Data: ${JSON.stringify(err.response.data)}`);
-    } else if (err.request) {
+    } else if (err?.request) {
       // The request was made but no response was received
       debugLog('No response received. Is the webhook endpoint running?');
     }

@@ -1,3 +1,4 @@
+import { RingApi } from 'ring-client-api';
 import { getActiveDings } from '../clients/ring.js';
 import { sendToN8n } from '../clients/webhook.js';
 import { shouldSendEvent } from './deduplication.js';
@@ -6,7 +7,7 @@ import { isEventExcluded } from '../utils/eventFilter.js';
 import config from '../config/index.js';
 
 // Function to directly poll for Ring events
-export async function pollRingEvents(ringApi, locations) {
+export async function pollRingEvents(ringApi: RingApi, locations: any[]): Promise<void> {
   try {
     // Try direct API call to get motion events
     const activeDings = await getActiveDings(ringApi);
@@ -30,7 +31,7 @@ export async function pollRingEvents(ringApi, locations) {
         const eventType = ding.kind === 'motion' ? 'motion_detected' : 'doorbell_press';
         // Check exclusion first, then deduplication
         if (!isEventExcluded(eventType) && shouldSendEvent(eventType, eventData)) {
-          await sendToN8n(eventType, eventData).catch((err) =>
+          await sendToN8n(eventType, eventData).catch((err: any) =>
             debugLog(`Failed to send polled event: ${err.message}`),
           );
         }
@@ -95,7 +96,7 @@ export async function pollRingEvents(ringApi, locations) {
 
             // Send to n8n with all possible ID fields for deduplication
             if (!isEventExcluded(eventType) && shouldSendEvent(eventType, eventData)) {
-              await sendToN8n(eventType, eventData).catch((err) =>
+              await sendToN8n(eventType, eventData).catch((err: any) =>
                 debugLog(`Failed to send polled event: ${err.message}`),
               );
             }
@@ -109,7 +110,7 @@ export async function pollRingEvents(ringApi, locations) {
           // Get cameras from the location's devices
           const devices = await location.getDevices();
           const cameras = devices.filter(
-            (device) =>
+            (device: any) =>
               device.deviceType === 'doorbot' ||
               device.deviceType === 'floodlight_v2' ||
               device.deviceType === 'stickup_cam',
@@ -131,7 +132,7 @@ export async function pollRingEvents(ringApi, locations) {
                 if (snapshot) {
                   debugLog(`Got snapshot from ${camera.name || camera.id}`);
                 }
-              } catch (snapshotError) {
+              } catch (snapshotError: any) {
                 debugLog(`Could not get snapshot: ${snapshotError.message}`);
               }
 
@@ -161,7 +162,7 @@ export async function pollRingEvents(ringApi, locations) {
                   !isEventExcluded('motion_detected') &&
                   shouldSendEvent('motion_detected', eventData)
                 ) {
-                  await sendToN8n('motion_detected', eventData).catch((err) =>
+                  await sendToN8n('motion_detected', eventData).catch((err: any) =>
                     debugLog(`Failed to send direct motion event: ${err.message}`),
                   );
                 }
@@ -195,32 +196,35 @@ export async function pollRingEvents(ringApi, locations) {
                     !isEventExcluded('motion_detected') &&
                     shouldSendEvent('motion_detected', eventData)
                   ) {
-                    await sendToN8n('motion_detected', eventData).catch((err) =>
+                    await sendToN8n('motion_detected', eventData).catch((err: any) =>
                       debugLog(`Failed to send motion event from history: ${err.message}`),
                     );
                   }
                 }
-              } catch (eventsError) {
+              } catch (eventsError: any) {
                 debugLog(`Could not get camera events: ${eventsError.message}`);
               }
-            } catch (cameraError) {
+            } catch (cameraError: any) {
               debugLog(`Error checking camera ${camera.name}: ${cameraError.message}`);
             }
           }
-        } catch (cameraError) {
+        } catch (cameraError: any) {
           debugLog(`Error getting cameras for ${location.name}: ${cameraError.message}`);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error(`Error polling events for ${location.name}: ${err.message}`);
       }
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error(`Error in pollRingEvents: ${err.message}`);
   }
 }
 
 // Start polling for events
-export function startPolling(ringApi, locations) {
+export function startPolling(
+  ringApi: RingApi,
+  locations: any[],
+): ReturnType<typeof setInterval> | null {
   if (locations && locations.length > 0) {
     info(`🕐 Starting event polling every ${config.pollingInterval / 1000} seconds`);
 
@@ -229,7 +233,7 @@ export function startPolling(ringApi, locations) {
 
     // Set up recurring polling
     return setInterval(() => {
-      pollRingEvents(ringApi, locations).catch((err) =>
+      pollRingEvents(ringApi, locations).catch((err: any) =>
         console.error(`Polling error: ${err.message}`),
       );
     }, config.pollingInterval);
