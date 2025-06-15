@@ -1,0 +1,14 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+.git
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+.husky
+.eslintrc.json
+.prettierrc.json
+*.md
+.DS_Store

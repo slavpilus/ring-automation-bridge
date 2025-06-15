@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  ring-webhook-bridge:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '3000:3000' # Optional: for health checks
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '3'
